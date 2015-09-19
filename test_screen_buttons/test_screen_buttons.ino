@@ -62,7 +62,6 @@ void setup()
  lcd.print("Mr. Skeltal's");
  lcd.setCursor(0,1);
  lcd.print("Spooky Adventure!");
- Serial.begin(9600);
  delay(2000);
  
  }
@@ -72,29 +71,41 @@ void setup()
   analogWrite(motorIn1,Speed);  //set the speed of motor
   analogWrite(motorIn2,0);  //stop the motorIn2 pin of motor
 }
-//The function to drive motor rotate counterclockwise
-void counterclockwise(int Speed)
+
+void waitAndShow(int Seconds)
 {
-  analogWrite(motorIn1,0);  //stop the motorIn1 pin of motor
-  analogWrite(motorIn2,Speed);  //set the speed of motor
+  lcd.setCursor(0,0);
+  lcd.print("Running for    ");
+  lcd.setCursor(2,1);
+  lcd.print(" more seconds.");
+  for (int i = Seconds; i > 0; i--){
+    lcd.setCursor(0,1);
+    lcd.print("  ");
+    lcd.setCursor(0,1);
+    lcd.print(i);
+    delay(1000);
+  }
 }
  
+void ramp()
+{
+   lcd.setCursor(0,0);
+   lcd.print("Ramping up...  ");
+   lcd.setCursor(0,1);
+   lcd.print("               ");
+   for(int i=95; i < 125; i++){
+     clockwise(i);
+     lcd.setCursor(0,1);
+     lcd.print(i);
+     delay(250); 
+   }
+}
  
  
 void loop()
 {
  //lcd.setCursor(9,1);            // move cursor to second line "1" and 9 spaces over
- //lcd.print(millis()/1000);      // display seconds elapsed since power-up
- 
- //motor control
- potValue = analogRead(potPin);  
- motorValue = map(potValue, 0, 1023, 0, 255);
- analogWrite(motorPin, motorValue);  
- Serial.print("potentiometer = " );     
- Serial.print(potValue);
- Serial.print("\t motor = ");
- Serial.println(motorValue);
- delay(2);    
+ //lcd.print(millis()/1000);      // display seconds elapsed since power-up   
 
  lcd.setCursor(0,1);            // move to the begining of the second line
  lcd_key = read_LCD_buttons();  // read the buttons
@@ -103,24 +114,13 @@ void loop()
      {
        case btnRIGHT:
          {
-           lcd.setCursor(0,0);
-           lcd.print("Ramping up...  ");
-           lcd.setCursor(0,1);
-           lcd.print("               ");
-           for(int i=1; i <256; i++){
-           clockwise(i);
-           delay(25); }
-           lcd.setCursor(0,0); 
-           lcd.print("Running        ");
-           lcd.setCursor(0,1);
-           lcd.print("               ");
-           delay(5000);
+           ramp();
+           waitAndShow(30);
            clockwise(0);
            lcd.setCursor(0,0); 
            lcd.print("Stopped        ");
            lcd.setCursor(0,1);
            lcd.print("               ");
-           delay(5000);
          }
        case btnLEFT:
          {
